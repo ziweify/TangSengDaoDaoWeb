@@ -30,12 +30,13 @@
     "rimraf": "^5.0.5",
     "turbo": "2.2.1"
   },
-  "packageManager": "yarn@1.22.19",
+  "packageManager": "yarn@1.22.17",
   "engines": {
     "node": ">=18.0.0",
-    "yarn": ">=1.22.19"
+    "yarn": ">=1.22.17"
   },
   "dependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "yarn": "^1.22.17"
   }
 }
