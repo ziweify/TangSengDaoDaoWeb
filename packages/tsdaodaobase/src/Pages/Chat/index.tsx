@@ -11,10 +11,11 @@ import { ConversationWrap } from "../../Service/Model";
 import WKApp, { ThemeMode } from "../../App";
 import ChannelSetting from "../../Components/ChannelSetting";
 import classNames from "classnames";
-import { Channel, ChannelInfo, WKSDK } from "wukongimjssdk";
+import {Channel, ChannelInfo, MessageText, WKSDK} from "wukongimjssdk";
 import { ChannelInfoListener } from "wukongimjssdk";
 import { ChatMenus } from "../../App";
 import ConversationContext from "../../Components/Conversation/context";
+import {MessageContent} from "wukongimjssdk/lib/model";
 
 export interface ChatContentPageProps {
   channel: Channel;
@@ -67,13 +68,7 @@ export class ChatContentPage extends Component<
       >
         <div className="wk-chat-content-chat">
           <div
-            className="wk-chat-conversation-header"
-            onClick={() => {
-              this.setState({
-                showChannelSetting: !this.state.showChannelSetting,
-              });
-            }}
-          >
+            className="wk-chat-conversation-header">
             <div className="wk-chat-conversation-header-content">
               <div className="wk-chat-conversation-header-left">
                 <div
@@ -90,14 +85,34 @@ export class ChatContentPage extends Component<
                     <img alt="" src={WKApp.shared.avatarChannel(channel)}></img>
                   </div>
                   <div className="wk-chat-conversation-header-channel-info">
-                    <div className="wk-chat-conversation-header-channel-info-name">
+                    <div className="wk-chat-conversation-header-channel-info-name"
+                         onClick={() => {
+                           this.setState({
+                             showChannelSetting: !this.state.showChannelSetting,
+                           });
+                         }}
+                    >
                       {channelInfo?.orgData?.displayName}
                     </div>
                     <div className="wk-chat-conversation-header-channel-info-tip"></div>
                   </div>
                 </div>
               </div>
-              <div className="wk-chat-conversation-header-right">
+              <div
+                  onClick={() => {
+                    //这里发送消息成功了。 记录下。
+                   const c = new Channel("39e096cb77e14983972c33c063509a2c", 2)
+                    const content = new MessageText("111111")
+                    this.conversationContext.sendMessage(content, c);
+                  }}
+              >发送信息</div>
+              <div className="wk-chat-conversation-header-right"
+                   onClick={() => {
+                     this.setState({
+                       showChannelSetting: !this.state.showChannelSetting,
+                     });
+                   }}
+              >
                 {WKApp.endpoints
                   .channelHeaderRightItems(channel)
                   .map((item: any, i: number) => {

@@ -124,7 +124,7 @@ export class LoginVM extends ProviderListener {
     async requestLoginWithUsernameAndPwd(username: string, password: string) {
         this.loginLoading = true
         this.notifyListener()
-        return WKApp.apiClient.post(`user/login`, { "username": username, "password": password, "flag": 1 }).then((result)=>{
+        return WKApp.apiClient.post(`user/login`, { "username": username, "password": password, "flag": 1}).then((result)=>{
             this.loginSuccess(result)
         }).finally(()=>{
             this.loginLoading = false

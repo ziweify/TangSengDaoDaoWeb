@@ -212,7 +212,7 @@ export default class BaseModule implements IModule {
     }
 
     WKSDK.shared().chatManager.addCMDListener((message: Message) => {
-      console.log("收到CMD->", message);
+      console.log("收到CMD.0->", message);
       const cmdContent = message.content as CMDContent;
       const param = cmdContent.param;
 
@@ -1202,6 +1202,32 @@ export default class BaseModule implements IModule {
               },
             },
           })
+        );
+
+        rows.push(
+            new Row({
+              cell: ListItemSwitch,
+              properties: {
+                title: "开启群功能",
+                checked: channelInfo?.binguo,
+                onCheck: (v: boolean, ctx: ListItemSwitchContext) => {
+                  if (!data.isManagerOrCreatorOfMe) {
+                    Toast.warning("只有管理者才能开启");
+                    return;
+                  }
+                  ctx.loading = true;
+                  ChannelSettingManager.shared
+                      .mute(v, channel)
+                      .then(() => {
+                        ctx.loading = false;
+                        data.refresh();
+                      })
+                      .catch(() => {
+                        ctx.loading = false;
+                      });
+                },
+              },
+            })
         );
 
         return new Section({

@@ -8,8 +8,8 @@ import  { LoginModule } from '@tsdaodao/login';
 import  { DataSourceModule } from '@tsdaodao/datasource';
 import {ContactsModule} from '@tsdaodao/contacts';
 
-const apiURL = "https://api.botgate.cn/v1/"
-
+//const apiURL = "https://api.botgate.cn/v1/"
+const apiURL = "http://api.myim.com:82/api/v1/"
 if((window as any).__TAURI_IPC__) { // tauri环境
   console.log("tauri环境")
   WKApp.apiClient.config.apiURL = apiURL
@@ -32,9 +32,9 @@ WKApp.config.appVersion = `${process.env.REACT_APP_VERSION || "0.0.0"}`
 
 WKApp.loginInfo.load() // 加载登录信息
 
-WKApp.shared.registerModule(new BaseModule()); // 基础模块
+WKApp.shared.registerModule(new BaseModule());      // 基础模块
 WKApp.shared.registerModule(new DataSourceModule()) // 数据源模块
-WKApp.shared.registerModule(new LoginModule()); // 登录模块
+WKApp.shared.registerModule(new LoginModule());    // 登录模块
 WKApp.shared.registerModule(new ContactsModule()); // 联系模块
 
 
