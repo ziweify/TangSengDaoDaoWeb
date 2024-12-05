@@ -11,7 +11,7 @@ import { ConversationWrap } from "../../Service/Model";
 import WKApp, { ThemeMode } from "../../App";
 import ChannelSetting from "../../Components/ChannelSetting";
 import classNames from "classnames";
-import {Channel, ChannelInfo, MessageText, WKSDK} from "wukongimjssdk";
+import {Channel, ChannelInfo, Mention, MessageText, WKSDK} from "wukongimjssdk";
 import { ChannelInfoListener } from "wukongimjssdk";
 import { ChatMenus } from "../../App";
 import ConversationContext from "../../Components/Conversation/context";
@@ -50,6 +50,19 @@ export class ChatContentPage extends Component<
 
   componentWillUnmount() {
     WKSDK.shared().channelManager.removeListener(this.channelInfoListener);
+  }
+
+  receiveMessage() {
+    const c = new Channel("39e096cb77e14983972c33c063509a2c", 2)
+    const content = new MessageText("@ff1002 111111")
+    const mn = new Mention()
+    mn.all = true
+    mn.uids = ['0f3f6f2f54da4d6fa7a1d6cd065cb10c']
+    content.mention = mn
+    // this.conversationContext.sendMessage(content, c);
+
+    //调用核心包再次发一次
+    WKSDK.shared().chatManager.send(content, c)
   }
 
   render(): React.ReactNode {
@@ -100,12 +113,22 @@ export class ChatContentPage extends Component<
               </div>
               <div
                   onClick={() => {
+                    //alert('----Received message: ---' );
                     //这里发送消息成功了。 记录下。
                    const c = new Channel("39e096cb77e14983972c33c063509a2c", 2)
-                    const content = new MessageText("111111")
-                    this.conversationContext.sendMessage(content, c);
+                    const content = new MessageText("@ff1002 111111")
+                    const mn = new Mention()
+                    mn.all = true
+                    mn.uids = ['0f3f6f2f54da4d6fa7a1d6cd065cb10c']
+                    content.mention = mn
+                    // this.conversationContext.sendMessage(content, c);
+
+                   //调用核心包再次发一次
+                    //WKSDK.shared().chatManager.send(content, c)
+                    this.receiveMessage()
                   }}
               >发送信息</div>
+
               <div className="wk-chat-conversation-header-right"
                    onClick={() => {
                      this.setState({

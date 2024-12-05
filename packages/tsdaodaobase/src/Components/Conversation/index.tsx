@@ -48,7 +48,7 @@ export class Conversation extends Component<ConversationProps> implements Conver
         if (!c) {
             c = this.props.channel
         }
-        console.log("Conversation::");
+        console.log("Conversation::"+content.conversationDigest);
         const message = await this.vm.sendMessage(content, c)
         return message
     }

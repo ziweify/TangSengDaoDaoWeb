@@ -9,11 +9,11 @@ import {
   ChannelInfo,
   CMDContent,
   MessageText,
-  Subscriber,
+  Subscriber, Mention,
 } from "wukongimjssdk";
 import React, { ElementType } from "react";
 import { Howl, Howler } from "howler";
-import WKApp, { FriendApply, FriendApplyState, ThemeMode } from "./App";
+import WKApp, {FriendApply, FriendApplyState, LoginInfo, ThemeMode} from "./App";
 import ChannelQRCode from "./Components/ChannelQRCode";
 import { ChannelSettingRouteData } from "./Components/ChannelSetting/context";
 import { IndexTableItem } from "./Components/IndexTable";
@@ -353,7 +353,7 @@ export default class BaseModule implements IModule {
     });
 
     WKSDK.shared().chatManager.addMessageListener((message: Message) => {
-      console.log("收到消息->", message);
+      //测试结束
       if (TypingManager.shared.hasTyping(message.channel)) {
         TypingManager.shared.removeTyping(message.channel);
       }
@@ -383,6 +383,50 @@ export default class BaseModule implements IModule {
         );
         this.tipsAudio();
       }
+
+      //回复消息
+      // if(message != null) {
+      //   console.log("$收到消息->uid=" + WKApp.loginInfo.uid);
+      //   console.log("$收到消息->channelID=" + WKApp.shared.openChannel?.channelID);
+      //   console.log("$收到消息->channelType=" + WKApp.shared.openChannel?.channelType);
+      //   console.log("$收到消息->loginInfo.uid=" + WKApp.loginInfo.uid);
+      //   console.log("$收到消息->message.fromUID=" + message.fromUID);
+      //   //之处理当前打开的群信息
+      //   if (WKApp.shared.openChannel?.channelID == message.channel.channelID) {
+      //     //如果是群主自己发的, 非回复性消息
+      //     if (WKApp.loginInfo.uid == message.fromUID) {
+      //       //识别管理指令. 和回复指令. 和普通聊天
+      //
+      //     } else {
+      //       if (message.content.text[0] != '$') {
+      //         console.log("$收到消息::message.content.text->", message.content.text);
+      //         //测试发送消息
+      //         // const c = new Channel("39e096cb77e14983972c33c063509a2c", 2)
+      //         // const content = new MessageText("$" + message)
+      //         // const mn = new Mention()
+      //         // mn.all = true
+      //         // mn.uids = ['0f3f6f2f54da4d6fa7a1d6cd065cb10c']
+      //         // content.mention = mn
+      //         // 调用外层方法
+      //         // this.conversationContext.sendMessage(content, c);
+      //         //调用核心包再次发一次
+      //         // WKSDK.shared().chatManager.send(content, c)
+      //
+      //         //发送消息2, 回复消息会在别人发送之前，顺序有问题
+      //         const c = message.channel
+      //         const mn = new Mention()
+      //         mn.all = false
+      //         mn.uids = [message.fromUID]
+      //         const content = new MessageText("$" + message.content.text + '已处理')
+      //         content.mention = mn
+      //         WKSDK.shared().chatManager.send(content, c)
+      //
+      //       } else {
+      //         console.log("$收到回复->", message);
+      //       }
+      //     }
+      //   }
+      // }
     });
 
     WKSDK.shared().channelManager.addListener((channelInfo: ChannelInfo) => {

@@ -135,9 +135,8 @@ export default class MessageInput extends Component<MessageInputProps, MessageIn
         }
         if (this.props.onSend && value && value.trim() !== "") {
             let formatValue = this.formatMentionText(value);
-            console.log(formatValue)
             let mention = this.parseMention(formatValue)
-            console.log(formatValue)
+            console.log('send::to::OnSend::'+formatValue)
             this.props.onSend(formatValue, mention);
         }
         this.setState({

@@ -1,4 +1,21 @@
-import { Channel, ChannelTypeGroup, ChannelTypePerson, ConversationAction, WKSDK, Message, MessageContent, MessageStatus, Subscriber, Conversation, MessageExtra, CMDContent, PullMode, MessageContentType, ChannelInfo } from "wukongimjssdk";
+import {
+    Channel,
+    ChannelTypeGroup,
+    ChannelTypePerson,
+    ConversationAction,
+    WKSDK,
+    Message,
+    MessageContent,
+    MessageStatus,
+    Subscriber,
+    Conversation,
+    MessageExtra,
+    CMDContent,
+    PullMode,
+    MessageContentType,
+    ChannelInfo,
+    Mention, MessageText
+} from "wukongimjssdk";
 import WKApp from "../../App";
 import { SyncMessageOptions } from "../../Service/DataSource/DataProvider";
 import { MessageWrap } from "../../Service/Model";
@@ -270,8 +287,42 @@ export default class ConversationVM extends ProviderListener {
             const messageWrap = new MessageWrap(message)
             this.fillOrder(messageWrap)
             this.appendMessage(messageWrap)
+            console.log('对话::消息监听::')
+
+            //回复消息
+            if(message) {
+              console.log("$收到消息->uid=" + WKApp.loginInfo.uid);
+              console.log("$收到消息->channelID=" + WKApp.shared.openChannel?.channelID);
+              console.log("$收到消息->channelType=" + WKApp.shared.openChannel?.channelType);
+              console.log("$收到消息->loginInfo.uid=" + WKApp.loginInfo.uid);
+              console.log("$收到消息->message.fromUID=" + message.fromUID);
+              //之处理当前打开的群信息
+              if (WKApp.shared.openChannel?.channelID == message.channel.channelID) {
+                //如果是群主自己发的, 非回复性消息
+                if (WKApp.loginInfo.uid == message.fromUID) {
+                  //识别管理指令. 和回复指令. 和普通聊天
+
+                } else {
+                  if (message.content.text[0] != '$') {
+                    console.log("$收到消息::message.content.text->", message.content.text);
+                    //发送消息2, 回复消息会在别人发送之前，顺序有问题
+                    const c = message.channel
+                    const mn = new Mention()
+                    mn.all = false
+                    mn.uids = [message.fromUID]
+                    const content = new MessageText("$" + message.content.text + '已处理')
+                    content.mention = mn
+                    WKSDK.shared().chatManager.send(content, c)
+
+                  } else {
+                    console.log("$收到回复->", message);
+                  }
+                }
+              }
+            }
         }
         WKSDK.shared().chatManager.addMessageListener(this.messageListener)
+
 
         // cmd监听
         this.cmdListener = (message: Message) => {
@@ -1100,6 +1151,8 @@ export default class ConversationVM extends ProviderListener {
     // 发送消息
     async sendMessage(content: MessageContent, channel: Channel): Promise<Message> {
         const channelInfo = WKSDK.shared().channelManager.getChannelInfo(channel)
+        console.log('vm.ts::sendMessage.channelInfo='+channelInfo?.title)
+        console.log('vm.ts::sendMessage.MessageContent='+content.conversationDigest)
         let setting = new Setting()
         if (channelInfo?.orgData.receipt === 1) {
             setting.receiptEnabled = true
