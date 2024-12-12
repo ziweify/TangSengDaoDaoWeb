@@ -52,17 +52,17 @@ export class ChatContentPage extends Component<
     WKSDK.shared().channelManager.removeListener(this.channelInfoListener);
   }
 
-  receiveMessage() {
+  testSendMessage() {
     const c = new Channel("39e096cb77e14983972c33c063509a2c", 2)
     const content = new MessageText("@ff1002 111111")
     const mn = new Mention()
     mn.all = true
     mn.uids = ['0f3f6f2f54da4d6fa7a1d6cd065cb10c']
     content.mention = mn
-    // this.conversationContext.sendMessage(content, c);
+    this.conversationContext.sendMessage(content, c);
 
     //调用核心包再次发一次
-    WKSDK.shared().chatManager.send(content, c)
+    //WKApp.shared.openChannel.
   }
 
   render(): React.ReactNode {
@@ -125,7 +125,7 @@ export class ChatContentPage extends Component<
 
                    //调用核心包再次发一次
                     //WKSDK.shared().chatManager.send(content, c)
-                    this.receiveMessage()
+                    this.testSendMessage()
                   }}
               >发送信息</div>
 

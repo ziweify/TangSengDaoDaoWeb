@@ -7,6 +7,11 @@ import  { BaseModule, WKApp } from '@tsdaodao/base';
 import  { LoginModule } from '@tsdaodao/login';
 import  { DataSourceModule } from '@tsdaodao/datasource';
 import {ContactsModule} from '@tsdaodao/contacts';
+import {sendMessageToContact} from './utils/sendMessage'
+import {message} from "@tauri-apps/api/dialog";
+import {Mention} from "react-mentions";
+import {Channel, MessageText} from "wukongimjssdk";
+//import { Channel, ChannelTypeGroup, ChannelTypePerson, ConversationAction, WKSDK, Mention, Message, MessageContent, Reminder, ReminderType, Reply,MessageText }
 
 //const apiURL = "https://api.botgate.cn/v1/"
 const apiURL = "http://api.myim.com:82/api/v1/"
@@ -24,6 +29,8 @@ if((window as any).__TAURI_IPC__) { // tauri环境
   }
 }
 
+//绑定到全局对象中
+window.sendMessageToContact = sendMessageToContact
 
 WKApp.apiClient.config.tokenCallback = ()=> {
   return WKApp.loginInfo.token
@@ -43,6 +50,7 @@ WKApp.shared.startup() // app启动
 
 ReactDOM.render(
   <React.StrictMode>
+
     <App />
   </React.StrictMode>,
   document.getElementById('root')

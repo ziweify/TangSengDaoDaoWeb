@@ -299,12 +299,12 @@ export default class ConversationVM extends ProviderListener {
               //之处理当前打开的群信息
               if (WKApp.shared.openChannel?.channelID == message.channel.channelID) {
                 //如果是群主自己发的, 非回复性消息
-                if (WKApp.loginInfo.uid == message.fromUID) {
+                if (WKApp.loginInfo.uid === message.fromUID) {
                   //识别管理指令. 和回复指令. 和普通聊天
-
+                    console.log("--------------------$群主消息::message.content.text->", message.content.text);
                 } else {
                   if (message.content.text[0] != '$') {
-                    console.log("$收到消息::message.content.text->", message.content.text);
+                    console.log("---------------------$不用回复消息::message.content.text->", message.content.text);
                     //发送消息2, 回复消息会在别人发送之前，顺序有问题
                     const c = message.channel
                     const mn = new Mention()
@@ -315,7 +315,7 @@ export default class ConversationVM extends ProviderListener {
                     WKSDK.shared().chatManager.send(content, c)
 
                   } else {
-                    console.log("$收到回复->", message);
+                    console.log("---------------------$回复消息->", message);
                   }
                 }
               }

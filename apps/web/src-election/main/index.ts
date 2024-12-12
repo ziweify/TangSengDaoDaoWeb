@@ -13,6 +13,7 @@ import fs from "fs";
 import tmp from 'tmp';
 import Screenshots from "electron-screenshots";
 import { join } from "path";
+import {sendMessageToContact} from '../../src/utils/sendMessage'
 
 import logo, { getNoMessageTrayIcon } from "./logo";
 import TSDD_FONFIG from "./confing";
