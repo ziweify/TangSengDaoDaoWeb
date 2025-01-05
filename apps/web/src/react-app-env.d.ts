@@ -3,4 +3,6 @@
 declare interface Window {
   ipc: any;
   __POWERED_BY_ZC__: boolean;
+  sendMessageToContact: any;
+  getConversation:any;
 }

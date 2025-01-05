@@ -55,8 +55,8 @@ async function registerMenus() {
 
   WKApp.menus.register("contacts", (param) => {
     const m = new Menus("contacts", "/contacts", "通讯录",
-     <img alt='通讯录' src={require("./assets/ContactsTab.svg").default}></img>,
-     <img alt='通讯录' src={require("./assets/ContactsTabSelected.svg").default} ></img>)
+      <img alt='通讯录' src={require("./assets/ContactsTab.svg").default}></img>,
+      <img alt='通讯录' src={require("./assets/ContactsTabSelected.svg").default} ></img>)
     m.badge = WKApp.shared.getFriendApplysUnreadCount();
     return m
   }, 4000)

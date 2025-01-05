@@ -11,11 +11,11 @@ import { ConversationWrap } from "../../Service/Model";
 import WKApp, { ThemeMode } from "../../App";
 import ChannelSetting from "../../Components/ChannelSetting";
 import classNames from "classnames";
-import {Channel, ChannelInfo, Mention, MessageText, WKSDK} from "wukongimjssdk";
+import { Channel, ChannelInfo, WKSDK } from "wukongimjssdk";
 import { ChannelInfoListener } from "wukongimjssdk";
 import { ChatMenus } from "../../App";
 import ConversationContext from "../../Components/Conversation/context";
-import {MessageContent} from "wukongimjssdk/lib/model";
+import { EndpointID } from "../../Service/Const";
 
 export interface ChatContentPageProps {
   channel: Channel;
@@ -52,18 +52,7 @@ export class ChatContentPage extends Component<
     WKSDK.shared().channelManager.removeListener(this.channelInfoListener);
   }
 
-  testSendMessage() {
-    const c = new Channel("39e096cb77e14983972c33c063509a2c", 2)
-    const content = new MessageText("@ff1002 111111")
-    const mn = new Mention()
-    mn.all = true
-    mn.uids = ['0f3f6f2f54da4d6fa7a1d6cd065cb10c']
-    content.mention = mn
-    this.conversationContext.sendMessage(content, c);
 
-    //调用核心包再次发一次
-    //WKApp.shared.openChannel.
-  }
 
   render(): React.ReactNode {
     const { channel, initLocateMessageSeq } = this.props;
@@ -81,7 +70,13 @@ export class ChatContentPage extends Component<
       >
         <div className="wk-chat-content-chat">
           <div
-            className="wk-chat-conversation-header">
+            className="wk-chat-conversation-header"
+            onClick={() => {
+              this.setState({
+                showChannelSetting: !this.state.showChannelSetting,
+              });
+            }}
+          >
             <div className="wk-chat-conversation-header-content">
               <div className="wk-chat-conversation-header-left">
                 <div
@@ -98,44 +93,14 @@ export class ChatContentPage extends Component<
                     <img alt="" src={WKApp.shared.avatarChannel(channel)}></img>
                   </div>
                   <div className="wk-chat-conversation-header-channel-info">
-                    <div className="wk-chat-conversation-header-channel-info-name"
-                         onClick={() => {
-                           this.setState({
-                             showChannelSetting: !this.state.showChannelSetting,
-                           });
-                         }}
-                    >
+                    <div className="wk-chat-conversation-header-channel-info-name">
                       {channelInfo?.orgData?.displayName}
                     </div>
                     <div className="wk-chat-conversation-header-channel-info-tip"></div>
                   </div>
                 </div>
               </div>
-              <div
-                  onClick={() => {
-                    //alert('----Received message: ---' );
-                    //这里发送消息成功了。 记录下。
-                   const c = new Channel("39e096cb77e14983972c33c063509a2c", 2)
-                    const content = new MessageText("@ff1002 111111")
-                    const mn = new Mention()
-                    mn.all = true
-                    mn.uids = ['0f3f6f2f54da4d6fa7a1d6cd065cb10c']
-                    content.mention = mn
-                    // this.conversationContext.sendMessage(content, c);
-
-                   //调用核心包再次发一次
-                    //WKSDK.shared().chatManager.send(content, c)
-                    this.testSendMessage()
-                  }}
-              >发送信息</div>
-
-              <div className="wk-chat-conversation-header-right"
-                   onClick={() => {
-                     this.setState({
-                       showChannelSetting: !this.state.showChannelSetting,
-                     });
-                   }}
-              >
+              <div className="wk-chat-conversation-header-right">
                 {WKApp.endpoints
                   .channelHeaderRightItems(channel)
                   .map((item: any, i: number) => {
@@ -213,7 +178,17 @@ export default class ChatPage extends Component<any> {
     // WKApp.routeMain.replaceToRoot(<ChatContentPage vm={this.vm}></ChatContentPage>)
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() { }
+
+  
+
+  updateConversation(channel: Channel) {
+    const conversation = WKSDK.shared().conversationManager.findConversation(channel)
+    if(conversation) {
+      conversation.unread = 0
+      conversation.lastMessage = undefined
+    }
+  }
 
   render(): ReactNode {
     return (
@@ -273,6 +248,7 @@ export default class ChatPage extends Component<any> {
                       <ConversationList
                         select={WKApp.shared.openChannel}
                         conversations={vm.conversations}
+                        onClearMessages={this.vm.clearMessages.bind(this.vm)}
                         onClick={(conversation: ConversationWrap) => {
                           vm.selectedConversation = conversation;
                           WKApp.endpoints.showConversation(

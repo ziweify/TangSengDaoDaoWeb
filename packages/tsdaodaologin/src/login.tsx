@@ -32,7 +32,7 @@ class Login extends Component<any, LoginState> {
                             <img src={`${process.env.PUBLIC_URL}/logo.png`} alt="logo" />
                         </div>
                         <div className="wk-login-content-slogan">
-                            BMW-系统登录v1
+                            更愉快的与朋友交流
                         </div>
                         <div className="wk-login-content-form">
                             <input type="text" placeholder="手机号" onChange={(v) => {
@@ -46,7 +46,7 @@ class Login extends Component<any, LoginState> {
                                     if (!vm.username) {
                                         Toast.error("手机号不能为空！")
                                         return
-                                    } 
+                                    }
                                     if (!vm.password) {
                                         Toast.error("密码不能为空！")
                                         return
@@ -125,7 +125,7 @@ class Login extends Component<any, LoginState> {
 
                     {/* <div className="wk-login-footer">
                         <ul>
-                            <li>注册小秘</li>
+                            <li>注册唐僧叨叨</li>
                             <li>忘记密码</li>
                             <li>隐私政策</li>
                             <li>用户协议</li>

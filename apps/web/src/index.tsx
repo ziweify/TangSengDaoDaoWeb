@@ -7,14 +7,11 @@ import  { BaseModule, WKApp } from '@tsdaodao/base';
 import  { LoginModule } from '@tsdaodao/login';
 import  { DataSourceModule } from '@tsdaodao/datasource';
 import {ContactsModule} from '@tsdaodao/contacts';
-import {sendMessageToContact} from './utils/sendMessage'
-import {message} from "@tauri-apps/api/dialog";
-import {Mention} from "react-mentions";
-import {Channel, MessageText} from "wukongimjssdk";
-//import { Channel, ChannelTypeGroup, ChannelTypePerson, ConversationAction, WKSDK, Mention, Message, MessageContent, Reminder, ReminderType, Reply,MessageText }
+import {sendMessageToContact} from "./utils/sendMessage";
+import {getConversation} from "./utils/getConversation";
 
-//const apiURL = "https://api.botgate.cn/v1/"
 const apiURL = "http://api.myim.com:82/api/v1/"
+
 if((window as any).__TAURI_IPC__) { // tauri环境
   console.log("tauri环境")
   WKApp.apiClient.config.apiURL = apiURL
@@ -29,8 +26,8 @@ if((window as any).__TAURI_IPC__) { // tauri环境
   }
 }
 
-//绑定到全局对象中
 window.sendMessageToContact = sendMessageToContact
+window.getConversation = getConversation
 
 WKApp.apiClient.config.tokenCallback = ()=> {
   return WKApp.loginInfo.token
@@ -39,9 +36,9 @@ WKApp.config.appVersion = `${process.env.REACT_APP_VERSION || "0.0.0"}`
 
 WKApp.loginInfo.load() // 加载登录信息
 
-WKApp.shared.registerModule(new BaseModule());      // 基础模块
+WKApp.shared.registerModule(new BaseModule()); // 基础模块
 WKApp.shared.registerModule(new DataSourceModule()) // 数据源模块
-WKApp.shared.registerModule(new LoginModule());    // 登录模块
+WKApp.shared.registerModule(new LoginModule()); // 登录模块
 WKApp.shared.registerModule(new ContactsModule()); // 联系模块
 
 
@@ -50,7 +47,6 @@ WKApp.shared.startup() // app启动
 
 ReactDOM.render(
   <React.StrictMode>
-
     <App />
   </React.StrictMode>,
   document.getElementById('root')

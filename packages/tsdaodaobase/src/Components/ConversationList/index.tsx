@@ -21,6 +21,7 @@ export interface ConversationListProps {
     conversations: ConversationWrap[]
     select?: Channel
     onClick?: (conversation: ConversationWrap) => void
+    onClearMessages?: (channel: Channel) => void
 }
 
 export interface ConversationListState {
@@ -160,7 +161,6 @@ export default class ConversationList extends Component<ConversationListProps, C
         }} className={classNames("wk-conversationlist-item", channelInfo?.top ? "wk-conversationlist-item-top" : undefined)} onContextMenu={(e) => {
             this._handleContextMenu(conversationWrap, e)
         }}>
-
             <div className={classNames("wk-conversationlist-item-content", selected ? "wk-conversationlist-item-selected" : undefined)}>
                 <div className="wk-conversationlist-item-left">
                     <div className="wk-conversationlist-item-avatar-box">
@@ -180,7 +180,7 @@ export default class ConversationList extends Component<ConversationListProps, C
 
                             </h3>
                             {
-                               channelInfo?.orgData.identityIcon ? <img style={{ "marginLeft": "4px", "width": channelInfo?.orgData?.identitySize.width, "height": channelInfo?.orgData?.identitySize.height }} src={channelInfo?.orgData.identityIcon}></img> : undefined
+                                channelInfo?.orgData.identityIcon ? <img style={{ "marginLeft": "4px", "width": channelInfo?.orgData?.identitySize.width, "height": channelInfo?.orgData?.identitySize.height }} src={channelInfo?.orgData.identityIcon}></img> : undefined
                             }
                             <div style={{ "width": "14px", height: "14px", "display": "flex", "alignItems": "center", "marginLeft": "5px" }}>
                                 {
@@ -235,14 +235,9 @@ export default class ConversationList extends Component<ConversationListProps, C
     }
 
     async onClearMessages(channel: Channel) {
-        const conversation = WKSDK.shared().conversationManager.findConversation(channel)
-        if (!conversation) {
-            return
+        if(this.props.onClearMessages) {
+            this.props.onClearMessages(channel)
         }
-        await WKApp.conversationProvider.clearConversationMessages(conversation)
-        conversation.lastMessage = undefined
-        WKApp.endpointManager.invoke(EndpointID.clearChannelMessages, channel)
-        this.setState({})
     }
 
     render() {

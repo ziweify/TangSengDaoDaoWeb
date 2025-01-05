@@ -126,7 +126,6 @@ export default class MessageInput extends Component<MessageInputProps, MessageIn
 
     send() {
         const { value } = this.state;
-        console.log('send::'+value)
         if (value && value.length > 1000) {
             Notification.error({
                 content: "输入内容长度不能大于1000字符！",
@@ -136,7 +135,6 @@ export default class MessageInput extends Component<MessageInputProps, MessageIn
         if (this.props.onSend && value && value.trim() !== "") {
             let formatValue = this.formatMentionText(value);
             let mention = this.parseMention(formatValue)
-            console.log(formatValue)
             this.props.onSend(formatValue, mention);
         }
         this.setState({

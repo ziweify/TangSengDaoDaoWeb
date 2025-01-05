@@ -13,7 +13,6 @@ import fs from "fs";
 import tmp from 'tmp';
 import Screenshots from "electron-screenshots";
 import { join } from "path";
-import {sendMessageToContact} from '../../src/utils/sendMessage'
 
 import logo, { getNoMessageTrayIcon } from "./logo";
 import TSDD_FONFIG from "./confing";
@@ -37,10 +36,10 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 
 let mainMenu: (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] = [
   {
-    label: "小秘",
+    label: "蜜聊",
     submenu: [
       {
-        label: `关于小秘-`,
+        label: `关于蜜聊`,
       },
       { label: "服务", role: "services" },
       { type: "separator" },

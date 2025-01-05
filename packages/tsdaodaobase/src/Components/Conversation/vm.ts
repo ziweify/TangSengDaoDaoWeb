@@ -1,21 +1,4 @@
-import {
-    Channel,
-    ChannelTypeGroup,
-    ChannelTypePerson,
-    ConversationAction,
-    WKSDK,
-    Message,
-    MessageContent,
-    MessageStatus,
-    Subscriber,
-    Conversation,
-    MessageExtra,
-    CMDContent,
-    PullMode,
-    MessageContentType,
-    ChannelInfo,
-    Mention, MessageText
-} from "wukongimjssdk";
+import { Channel, ChannelTypeGroup, ChannelTypePerson, ConversationAction, WKSDK, Message, MessageContent, MessageStatus, Subscriber, Conversation, MessageExtra, CMDContent, PullMode, MessageContentType, ChannelInfo, ConversationListener } from "wukongimjssdk";
 import WKApp from "../../App";
 import { SyncMessageOptions } from "../../Service/DataSource/DataProvider";
 import { MessageWrap } from "../../Service/Model";
@@ -57,6 +40,7 @@ export default class ConversationVM extends ProviderListener {
     messageListener!: MessageListener // 消息监听
     cmdListener!: MessageListener // cmd消息监听
     messageStatusListener!: MessageStatusListener // 消息状态监听
+    conversationListener!: ConversationListener // 会话监听
     lastMessage?: MessageWrap // 此会话的最后一条最新的消息
     lastLocalMessageElement?: HTMLElement | null // 最后一条消息的dom元素
     private _showScrollToBottomBtn?: boolean = false // 是否显示底部按钮
@@ -270,6 +254,17 @@ export default class ConversationVM extends ProviderListener {
 
     didMount(): void {
 
+        this.conversationListener = (conversation: Conversation, action: ConversationAction) => {
+            if(!conversation.channel.isEqual(this.channel)) {
+                return
+            }
+            if(action == ConversationAction.update) {
+                console.log("update-2--->",conversation.unread)
+                this.unreadCount = conversation.unread
+            }
+        }
+        WKSDK.shared().conversationManager.addConversationListener(this.conversationListener)
+
         // 消息监听
         this.messageListener = (message: Message) => {
             if (!message.channel.isEqual(this.channel)) {
@@ -287,42 +282,8 @@ export default class ConversationVM extends ProviderListener {
             const messageWrap = new MessageWrap(message)
             this.fillOrder(messageWrap)
             this.appendMessage(messageWrap)
-            console.log('对话::消息监听::')
-
-            //回复消息
-            if(message) {
-              console.log("$收到消息->uid=" + WKApp.loginInfo.uid);
-              console.log("$收到消息->channelID=" + WKApp.shared.openChannel?.channelID);
-              console.log("$收到消息->channelType=" + WKApp.shared.openChannel?.channelType);
-              console.log("$收到消息->loginInfo.uid=" + WKApp.loginInfo.uid);
-              console.log("$收到消息->message.fromUID=" + message.fromUID);
-              //之处理当前打开的群信息
-              if (WKApp.shared.openChannel?.channelID == message.channel.channelID) {
-                //如果是群主自己发的, 非回复性消息
-                if (WKApp.loginInfo.uid === message.fromUID) {
-                  //识别管理指令. 和回复指令. 和普通聊天
-                    console.log("--------------------$群主消息::message.content.text->", message.content.text);
-                } else {
-                  if (message.content.text[0] != '$') {
-                    console.log("---------------------$不用回复消息::message.content.text->", message.content.text);
-                    //发送消息2, 回复消息会在别人发送之前，顺序有问题
-                    const c = message.channel
-                    const mn = new Mention()
-                    mn.all = false
-                    mn.uids = [message.fromUID]
-                    const content = new MessageText("$" + message.content.text + '已处理')
-                    content.mention = mn
-                    WKSDK.shared().chatManager.send(content, c)
-
-                  } else {
-                    console.log("---------------------$回复消息->", message);
-                  }
-                }
-              }
-            }
         }
         WKSDK.shared().chatManager.addMessageListener(this.messageListener)
-
 
         // cmd监听
         this.cmdListener = (message: Message) => {
@@ -354,8 +315,12 @@ export default class ConversationVM extends ProviderListener {
 
         WKApp.endpointManager.setMethod(EndpointID.clearChannelMessages, (channel: Channel) => {
             if (channel.isEqual(this.channel)) {
+                if(this.messagesOfOrigin.length > 0) {
+                    this.browseToMessageSeq = this.messagesOfOrigin[this.messagesOfOrigin.length-1].messageSeq
+                }
                 this.messagesOfOrigin = []
                 this.messages = []
+                this.lastMessage = undefined
                 this.notifyListener()
             }
         }, {})
@@ -432,6 +397,7 @@ export default class ConversationVM extends ProviderListener {
         WKSDK.shared().chatManager.removeCMDListener(this.cmdListener)
 
         TypingManager.shared.removeTypingListener(this.typingListener)
+        WKSDK.shared().conversationManager.removeConversationListener(this.conversationListener)
 
     }
 
@@ -715,13 +681,14 @@ export default class ConversationVM extends ProviderListener {
             this.lastMessage = message
             change = true
         }
-        if (change) {
+        if (change && this.showScrollToBottomBtn) {
             this.refreshNewMsgCount()
         }
     }
 
     // 刷新新消息数量
     refreshNewMsgCount() {
+       
         const oldUnreadCount = this.unreadCount
         if (this.browseToMessageSeq == 0) {
             this.unreadCount = 0
@@ -740,6 +707,7 @@ export default class ConversationVM extends ProviderListener {
         if (oldUnreadCount != this.unreadCount) {
             const conversation = WKSDK.shared().conversationManager.findConversation(this.channel)
             if (conversation) {
+                console.log("this.unreadCount--->",this.unreadCount)
                 conversation.unread = this.unreadCount
                 WKSDK.shared().conversationManager.notifyConversationListeners(conversation, ConversationAction.update)
             }
@@ -1151,8 +1119,6 @@ export default class ConversationVM extends ProviderListener {
     // 发送消息
     async sendMessage(content: MessageContent, channel: Channel): Promise<Message> {
         const channelInfo = WKSDK.shared().channelManager.getChannelInfo(channel)
-        console.log('vm.ts::sendMessage.channelInfo='+channelInfo?.title)
-        console.log('vm.ts::sendMessage.MessageContent='+content.conversationDigest)
         let setting = new Setting()
         if (channelInfo?.orgData.receipt === 1) {
             setting.receiptEnabled = true
