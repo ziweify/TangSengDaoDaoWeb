@@ -212,7 +212,7 @@ export default class BaseModule implements IModule {
     }
 
     WKSDK.shared().chatManager.addCMDListener((message: Message) => {
-      console.log("::收到CMD::", JSON.stringify(message));
+      console.log("收到CMD->", message);
       const cmdContent = message.content as CMDContent;
       const param = cmdContent.param;
 
@@ -353,7 +353,7 @@ export default class BaseModule implements IModule {
     });
 
     WKSDK.shared().chatManager.addMessageListener((message: Message) => {
-      console.log("::收到消息::", JSON.stringify(message));
+      console.log("收到消息->", message);
       if (TypingManager.shared.hasTyping(message.channel)) {
         TypingManager.shared.removeTyping(message.channel);
       }

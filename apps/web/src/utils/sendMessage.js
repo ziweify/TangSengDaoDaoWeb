@@ -5,7 +5,7 @@ export function sendMessageToContact(channelID, channelType, uids, message){
     console.log(`-----------------------------------`)
     console.log(`频道${channelID},lx:${channelType},向联系人:[${uids}],发送消息:[${message}]`)
     console.log("---sendMessageToContact----");
-    //发送消息2, 回复消息会在别人发送之前，顺序有问题
+  
     const c = new Channel(channelID, channelType)
     const content = new MessageText(message)
     const mn = new Mention()
